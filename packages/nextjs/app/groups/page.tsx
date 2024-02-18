@@ -159,7 +159,7 @@ export default function GroupsPage() {
               <span>Join group</span>
             </button>
           ) : (
-            <button className="btn btn-primary rounded-lg">New zkPrescription</button>
+            <button className="btn btn-primary rounded-lg">New Prescription</button>
           )}
         </div>
 
@@ -194,7 +194,7 @@ export default function GroupsPage() {
       <div className="flex items-center flex-col w-full">
         <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center w-1/2 rounded-3xl space-y-4">
           <div className="flex justify-center items-center">
-            <h1 className="text-3xl font-semibold text-foreground">zkPrescription Group</h1>
+            <h1 className="text-3xl font-semibold text-foreground">prezkription Group</h1>
           </div>
           <div className="flex justify-center items-center w-4/5">{renderGroup()}</div>
           <div className="flex justify-center items-center w-4/5">
