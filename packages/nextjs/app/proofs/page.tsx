@@ -3,6 +3,8 @@
 import React, { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Identity } from "@semaphore-protocol/identity";
+import { useSignMessage } from "wagmi";
+import { createOnchainAttestation } from "~~/services/eas";
 
 const groupId = process.env.NEXT_PUBLIC_BANDADA_GROUP_ID ?? "";
 const prezkriptionsGroupId = process.env.NEXT_PUBLIC_PREZKRIPTIONS_GROUP_ID ?? "";
@@ -16,12 +18,49 @@ export default function ProofsPage() {
   const [treatmentDuration, setTreatmentDuration] = useState(3);
   const [treatmentInstructions, setTreatmentInstructions] = useState("");
   const [patientId, setPatientId] = useState("");
+  const [proof, setProof] = useState("");
 
   const [_identity, setIdentity] = useState<Identity>();
+  const [_patientIdentity, setPatientIdentity] = useState<Identity>();
   const [_loading, setLoading] = useState<boolean>(false);
   const [prescriptionId, setPrescriptionId] = useState("");
 
   const localStorageTag = process.env.NEXT_PUBLIC_LOCAL_STORAGE_TAG ?? "";
+
+  const { data: signMessageData, signMessage } = useSignMessage({
+    async onSettled(signMessageData, error) {
+      console.log(signMessageData);
+      const prezkriptionIdentity = new Identity(signMessageData);
+      console.log(prezkriptionIdentity);
+
+      const response2 = await fetch("api/group/prezkriptions/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          groupId: prezkriptionsGroupId,
+          commitment: prezkriptionIdentity.commitment.toString(),
+        }),
+      });
+      if (response2.status === 200) {
+        const form = {
+          medicIdentity: _identity?.commitment.toString(),
+          patientIdentity: _patientIdentity?.commitment.toString(),
+          medicationName,
+          medicationDoseForm,
+          medicationDosage,
+          treatmentInstructions,
+          treatmentDuration,
+          zkPrescriptionGroupId: prezkriptionsGroupId,
+          zkPrescriptionProof: prezkriptionIdentity.commitment.toString(),
+        };
+
+        console.log(form);
+        setProof(prezkriptionIdentity.commitment.toString());
+        console.log("success!!");
+        createOnchainAttestation(form);
+      }
+    },
+  });
 
   useEffect(() => {
     const identityString = localStorage.getItem(localStorageTag);
@@ -40,6 +79,7 @@ export default function ProofsPage() {
     event?.preventDefault();
     setLoading(true);
     const patientIdentity = new Identity(patientId);
+    setPatientIdentity(patientIdentity);
     try {
       const response = await fetch("api/group/join", {
         method: "POST",
@@ -53,32 +93,7 @@ export default function ProofsPage() {
       if (response.status === 200) {
         console.log("patient identity added successfully, now generate proof");
 
-        const prezkriptionIdentity = new Identity(prescriptionId);
-
-        const response2 = await fetch("api/group/prezkriptions/join", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            groupId: prezkriptionsGroupId,
-            commitment: prezkriptionIdentity.commitment.toString(),
-          }),
-        });
-        if (response2.status === 200) {
-          const form = {
-            medicIdentity: _identity?.commitment.toString(),
-            patientIdentity: patientIdentity.commitment.toString(),
-            medicationName,
-            medicationDoseForm,
-            medicationDosage,
-            treatmentInstructions,
-            treatmentDuration,
-            zkPrescriptionGroupId: prezkriptionsGroupId,
-            zkPrescriptionProof: prezkriptionIdentity.commitment.toString(),
-          };
-
-          console.log(form);
-          console.log("success!!");
-        }
+        signMessage({ message: prescriptionId });
       } else {
         console.log(await response.json());
       }
