@@ -18,7 +18,6 @@ export default function ProofsPage() {
   const [treatmentDuration, setTreatmentDuration] = useState(3);
   const [treatmentInstructions, setTreatmentInstructions] = useState("");
   const [patientId, setPatientId] = useState("");
-  const [proof, setProof] = useState("");
 
   const [_identity, setIdentity] = useState<Identity>();
   const [_patientIdentity, setPatientIdentity] = useState<Identity>();
@@ -27,7 +26,7 @@ export default function ProofsPage() {
 
   const localStorageTag = process.env.NEXT_PUBLIC_LOCAL_STORAGE_TAG ?? "";
 
-  const { data: signMessageData, signMessage } = useSignMessage({
+  const { signMessage } = useSignMessage({
     async onSettled(signMessageData, error) {
       console.log(signMessageData);
       const prezkriptionIdentity = new Identity(signMessageData);
@@ -55,7 +54,6 @@ export default function ProofsPage() {
         };
 
         console.log(form);
-        setProof(prezkriptionIdentity.commitment.toString());
         console.log("success!!");
         createOnchainAttestation(form);
       }

@@ -159,7 +159,22 @@ export default function GroupsPage() {
               <span>Join group</span>
             </button>
           ) : (
-            <button className="btn btn-primary rounded-lg">New Prescription</button>
+            <div className="w-4/5 flex flex-col items-center py-2">
+              <label htmlFor="username" className="form-control w-full">
+                <div className="label">
+                  <span className="label-text">Username</span>
+                </div>
+                <input
+                  type="text"
+                  id="medicIdentity"
+                  name="medicIdentity"
+                  defaultValue={_identity?.commitment.toString() ?? ""}
+                  className="input input-bordered border-2 w-full rounded-lg h-10 bg-base-200 text-left"
+                  disabled
+                />
+              </label>
+              <button className="btn btn-accent rounded-lg">Verify proof</button>
+            </div>
           )}
         </div>
 

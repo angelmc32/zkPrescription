@@ -12,6 +12,7 @@ const Home: NextPage = () => {
   const [_identity, setIdentity] = useState<Identity>();
   const [_username, setUsername] = useState<string>("");
   const [_isLoading, setIsLoading] = useState<boolean>(false);
+  const [proof, setProof] = useState("");
 
   const localStorageTag = process.env.NEXT_PUBLIC_LOCAL_STORAGE_TAG ?? "";
 
@@ -167,7 +168,6 @@ const Home: NextPage = () => {
                 />
               </label>
             </form>
-
             <div className="w-4/5 flex justify-center items-center mt-2">
               {/* <div className="flex justify-center w-full py-4" onClick={createIdentity}>
                 <button className="btn btn-primary rounded-lg">Retrieve</button>
