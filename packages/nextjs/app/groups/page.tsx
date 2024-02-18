@@ -6,7 +6,6 @@ import { Identity } from "@semaphore-protocol/identity";
 import Stepper from "~~/components/stepper";
 import { getGroup, getMembersGroup } from "~~/services/bandada";
 import { getRoot } from "~~/services/semaphore";
-import { useGlobalState } from "~~/services/store/store";
 
 export default function GroupsPage() {
   const router = useRouter();
@@ -20,8 +19,7 @@ export default function GroupsPage() {
   const [_renderInfoLoading, setRenderInfoLoading] = useState<boolean>(false);
   const [_users, setUsers] = useState<string[]>([]);
 
-  const currentIdentity = useGlobalState(state => state.currentIdentity);
-  //   const localStorageTag = process.env.NEXT_PUBLIC_LOCAL_STORAGE_TAG!;
+  const localStorageTag = process.env.NEXT_PUBLIC_LOCAL_STORAGE_TAG ?? "";
 
   const groupId = process.env.NEXT_PUBLIC_BANDADA_GROUP_ID ?? "";
 
@@ -36,12 +34,14 @@ export default function GroupsPage() {
   }, [groupId]);
 
   useEffect(() => {
-    if (!currentIdentity) {
+    const identityString = localStorage.getItem(localStorageTag);
+
+    if (!identityString) {
       router.push("/");
       return;
     }
 
-    const identity = new Identity(currentIdentity);
+    const identity = new Identity(identityString);
 
     setIdentity(identity);
 
@@ -54,7 +54,7 @@ export default function GroupsPage() {
     }
 
     isMember();
-  }, [router, getUsers, currentIdentity]);
+  }, [router, getUsers, localStorageTag]);
 
   // Function for credential groups to update the supabase backend
   const afterJoinCredentialGroup = useCallback(async () => {
