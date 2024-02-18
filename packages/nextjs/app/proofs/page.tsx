@@ -27,7 +27,7 @@ export default function ProofsPage() {
   const localStorageTag = process.env.NEXT_PUBLIC_LOCAL_STORAGE_TAG ?? "";
 
   const { signMessage } = useSignMessage({
-    async onSettled(signMessageData, error) {
+    async onSettled(signMessageData) {
       console.log(signMessageData);
       const prezkriptionIdentity = new Identity(signMessageData);
       console.log(prezkriptionIdentity);
