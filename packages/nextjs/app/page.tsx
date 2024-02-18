@@ -12,6 +12,7 @@ const Home: NextPage = () => {
   const [_identity, setIdentity] = useState<Identity>();
   const [_username, setUsername] = useState<string>("");
   const [_isLoading, setIsLoading] = useState<boolean>(false);
+  const [proof, setProof] = useState("");
 
   const localStorageTag = process.env.NEXT_PUBLIC_LOCAL_STORAGE_TAG ?? "";
 
