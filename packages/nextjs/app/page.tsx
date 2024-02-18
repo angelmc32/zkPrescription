@@ -7,11 +7,15 @@ import type { NextPage } from "next";
 import { recoverMessageAddress } from "viem";
 import { useSignMessage } from "wagmi";
 import Stepper from "~~/components/stepper";
+import { useGlobalState } from "~~/services/store/store";
 
 const Home: NextPage = () => {
   const [_identity, setIdentity] = useState<Identity>();
   const [_username, setUsername] = useState<string>("");
   const [_isLoading, setIsLoading] = useState<boolean>(false);
+
+  const currentIdentity = useGlobalState(state => state.currentIdentity);
+  const setCurrentIdentity = useGlobalState(state => state.setCurrentIdentity);
 
   const router = useRouter();
 
@@ -24,10 +28,6 @@ const Home: NextPage = () => {
           message: _username,
           signature: signMessageData,
         });
-        const semaphoreIdentity = new Identity(signMessageData);
-        console.log(semaphoreIdentity);
-        console.log(semaphoreIdentity.toString());
-        console.log(semaphoreIdentity.commitment);
 
         try {
           const semaphoreIdentity = new Identity(signMessageData);
@@ -43,17 +43,12 @@ const Home: NextPage = () => {
 
           if (response.status === 200) {
             const data = await response.json();
-
-            console.log(data);
-
-            console.log(`Your identity was saved 🎉`);
+            console.log(`Your identity was saved in db with id ${data.id} 🎉`);
           } else {
             const data = await response.json();
-            console.log(data);
-            console.log("RESPONSE ERROR!!!", response);
+            console.error(data.error);
           }
-
-          localStorage.setItem(localStorageTag, semaphoreIdentity.toString());
+          setCurrentIdentity(semaphoreIdentity.toString());
           setIdentity(semaphoreIdentity);
         } catch (error) {
           console.error(error);
@@ -66,8 +61,6 @@ const Home: NextPage = () => {
       }
     },
   });
-
-  const localStorageTag = process.env.NEXT_PUBLIC_LOCAL_STORAGE_TAG ?? "";
 
   async function fetchIdentity(commitmentString: string) {
     try {
@@ -89,10 +82,8 @@ const Home: NextPage = () => {
   }
 
   useEffect(() => {
-    const identityString = localStorage.getItem(localStorageTag);
-
-    if (identityString) {
-      const semaphoreIdentity = new Identity(identityString);
+    if (currentIdentity) {
+      const semaphoreIdentity = new Identity(currentIdentity);
       setIdentity(semaphoreIdentity);
       const commitmentAsString = semaphoreIdentity.commitment.toString();
       console.log("Your Semaphore identity was retrieved from the browser cache and used to retrieve your profile 👌🏽");
@@ -100,7 +91,7 @@ const Home: NextPage = () => {
     } else {
       console.log("Create your Semaphore identity 👆🏽");
     }
-  }, [localStorageTag]);
+  }, [currentIdentity]);
 
   const renderIdentity = () => {
     return (
