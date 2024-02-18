@@ -139,7 +139,7 @@ const Home: NextPage = () => {
       <div className="flex-grow bg-base-300 w-full px-8 py-12">
         <div className="flex items-center flex-col w-full">
           <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center w-1/2 rounded-3xl space-y-4">
-            <h2 className="text-3xl">Login</h2>
+            <h2 className="text-3xl">Private Identities</h2>
             <div className="w-4/5 flex flex-col space-y-2">
               <p className="text-left m-0">Let&apos;s retrieve your identity.</p>
               <div>
@@ -167,7 +167,6 @@ const Home: NextPage = () => {
                 />
               </label>
             </form>
-
             <div className="w-4/5 flex justify-center items-center mt-2">
               {/* <div className="flex justify-center w-full py-4" onClick={createIdentity}>
                 <button className="btn btn-primary rounded-lg">Retrieve</button>
